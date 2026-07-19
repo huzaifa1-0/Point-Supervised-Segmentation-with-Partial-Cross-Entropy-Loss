@@ -66,18 +66,18 @@ class PartialFocalCE(nn.Module):
         assert target.shape == (b, h, w), f"target shape {target.shape} != {(b, h, w)}"
         assert mask_labeled.shape == (b, h, w), f"mask_labeled shape {mask_labeled.shape} != {(b, h, w)}"
 
-        log_probs = F.log_softmax(logits, dim=1)         # (B, C, H, W)
+        log_probs = F.log_softmax(logits, dim=1)         
         probs = log_probs.exp()
 
         target_clamped = target.clamp(min=0, max=self.num_classes - 1)
-        target_onehot = F.one_hot(target_clamped, self.num_classes)      # (B, H, W, C)
-        target_onehot = target_onehot.permute(0, 3, 1, 2).float()        # (B, C, H, W)
+        target_onehot = F.one_hot(target_clamped, self.num_classes)      
+        target_onehot = target_onehot.permute(0, 3, 1, 2).float()      
 
-        pt = (probs * target_onehot).sum(dim=1)           # (B, H, W) prob of true class
-        logpt = (log_probs * target_onehot).sum(dim=1)     # (B, H, W)
+        pt = (probs * target_onehot).sum(dim=1)           
+        logpt = (log_probs * target_onehot).sum(dim=1)     
 
         focal_term = (1.0 - pt).clamp(min=self.eps) ** self.gamma
-        per_pixel_loss = -focal_term * logpt                # (B, H, W)
+        per_pixel_loss = -focal_term * logpt              
 
         if self.alpha is not None:
             alpha_map = (target_onehot * self.alpha.view(1, -1, 1, 1)).sum(dim=1)

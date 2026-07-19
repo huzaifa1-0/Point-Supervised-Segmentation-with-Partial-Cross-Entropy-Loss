@@ -1,20 +1,3 @@
-"""
-dataset.py
-PyTorch Dataset classes for point-supervised DeepGlobe segmentation.
-
-Two datasets:
-  - PointSupervisedTileDataset : training set. Each __getitem__ re-samples a
-    fresh set of point labels (on-the-fly, from the cached full mask) so the
-    model sees slightly different points across epochs -- more robust than
-    freezing one fixed sample of points, and free to do since sampling is cheap.
-  - FullMaskTileDataset : val/test set. Always returns the full dense mask
-    (never point-sparsified) for fair mIoU / pixel-accuracy evaluation.
-
-Both operate on pre-tiled (image_tile, class_id_mask_tile) pairs produced by
-data_utils.tile_image_and_mask, so the expensive decode+tile step only needs
-to run once per source image.
-"""
-
 from __future__ import annotations
 
 from typing import Callable, List, Tuple
@@ -71,7 +54,7 @@ class PointSupervisedTileDataset(Dataset):
         self._epoch = 0
 
     def set_epoch(self, epoch: int):
-        """Call at the start of each epoch to vary the point sample deterministically."""
+        
         self._epoch = epoch
 
     def __len__(self):
@@ -82,7 +65,7 @@ class PointSupervisedTileDataset(Dataset):
 
         seed = None
         if self.base_seed is not None:
-            seed = self.base_seed + idx * 9973 + self._epoch  # cheap deterministic hash
+            seed = self.base_seed + idx * 9973 + self._epoch  
 
         sampler_fn = SAMPLERS[self.strategy]
         if self.strategy == "pixel_proportional":
