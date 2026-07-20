@@ -1,0 +1,2 @@
+# Point-Supervised-Segmentation-with-Partial-Cross-Entropy-Loss
+Standard semantic segmentation requires a dense pixel mask for every training image. In this repo, supervision is instead given as sparse point annotations (a few labeled pixels per class per image). The goal is to train a segmentation network using only these points, via a Partial Cross-Entropy (pCE) loss that ignores unlabeled pixels.
