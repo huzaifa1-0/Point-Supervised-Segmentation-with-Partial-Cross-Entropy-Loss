@@ -1,26 +1,7 @@
-"""
-data_utils.py
-Utilities for the DeepGlobe Land Cover Classification dataset:
-  - RGB color-coded mask -> integer class-ID mask decoding
-  - Tiling of large (2448x2448) images/masks into smaller training patches
-
-DeepGlobe class/color table (7 land-cover classes):
-    0: Urban land      (0, 255, 255)
-    1: Agriculture land(255, 255, 0)
-    2: Rangeland       (255, 0, 255)
-    3: Forest land     (0, 255, 0)
-    4: Water           (0, 0, 255)
-    5: Barren land     (255, 255, 255)
-    6: Unknown         (0, 0, 0)   -> treated as IGNORE_INDEX everywhere
-"""
-
 from __future__ import annotations
 
 import numpy as np
 
-# ---------------------------------------------------------------------------
-# Class / color definitions
-# ---------------------------------------------------------------------------
 
 CLASS_NAMES = [
     "Urban land",
@@ -34,19 +15,19 @@ CLASS_NAMES = [
 
 CLASS_COLORS = np.array(
     [
-        (0, 255, 255),   # 0 Urban land
-        (255, 255, 0),   # 1 Agriculture land
-        (255, 0, 255),   # 2 Rangeland
-        (0, 255, 0),     # 3 Forest land
-        (0, 0, 255),     # 4 Water
-        (255, 255, 255), # 5 Barren land
-        (0, 0, 0),       # 6 Unknown
+        (0, 255, 255),   
+        (255, 255, 0),   
+        (255, 0, 255),   
+        (0, 255, 0),     
+        (0, 0, 255),     
+        (255, 255, 255), 
+        (0, 0, 0),      
     ],
     dtype=np.uint8,
 )
 
-NUM_CLASSES = 6          # trainable classes (Unknown excluded)
-IGNORE_INDEX = 6          # class id reserved for "Unknown" / unmapped pixels
+NUM_CLASSES = 6          
+IGNORE_INDEX = 6          
 
 
 def rgb_mask_to_class_id(rgb_mask: np.ndarray) -> np.ndarray:
@@ -71,7 +52,7 @@ def rgb_mask_to_class_id(rgb_mask: np.ndarray) -> np.ndarray:
     h, w, _ = rgb_mask.shape
     class_id_mask = np.full((h, w), IGNORE_INDEX, dtype=np.int64)
 
-    # Encode RGB triplets as single integers for fast exact-match comparison.
+    
     flat = rgb_mask.astype(np.int64)
     encoded = flat[..., 0] * 256 * 256 + flat[..., 1] * 256 + flat[..., 2]
 
@@ -91,9 +72,7 @@ def class_id_to_rgb_mask(class_id_mask: np.ndarray) -> np.ndarray:
     return rgb
 
 
-# ---------------------------------------------------------------------------
-# Tiling
-# ---------------------------------------------------------------------------
+
 
 def tile_image_and_mask(
     image: np.ndarray,
@@ -129,7 +108,7 @@ def tile_image_and_mask(
     xs = list(range(0, w - tile_size + 1, stride)) if drop_partial else list(range(0, w, stride))
 
     if not drop_partial:
-        # ensure the last tile still covers the edge
+        
         if ys[-1] + tile_size < h:
             ys.append(h - tile_size)
         if xs[-1] + tile_size < w:
@@ -142,7 +121,7 @@ def tile_image_and_mask(
             if y1 > h or x1 > w:
                 if drop_partial:
                     continue
-                # pad
+                
                 img_tile = np.zeros((tile_size, tile_size, 3), dtype=image.dtype)
                 mask_tile = np.full((tile_size, tile_size), IGNORE_INDEX, dtype=class_id_mask.dtype)
                 y1c, x1c = min(y1, h), min(x1, w)

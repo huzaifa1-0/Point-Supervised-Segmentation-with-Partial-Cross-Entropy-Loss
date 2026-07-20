@@ -36,7 +36,7 @@ class ConfusionMatrixMeter:
             preds_np = preds_np[valid]
             target_np = target_np[valid]
 
-        # guard against any out-of-range prediction (shouldn't happen, but safe)
+        
         valid_range = (preds_np >= 0) & (preds_np < self.num_classes) & \
                       (target_np >= 0) & (target_np < self.num_classes)
         preds_np = preds_np[valid_range]

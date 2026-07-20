@@ -104,9 +104,7 @@ def run_sampling_strategy_experiment(
         print(f"\n=== Experiment B: strategy={strategy}, {n_points} points/class ===")
         torch.manual_seed(seed)
 
-        # NOTE: pixel_proportional_point_sample takes a *total* point budget;
-        # scale it up so the comparison is roughly apples-to-apples in total
-        # annotation effort per tile (n_points * num_present_classes ~= n_points * NUM_CLASSES).
+        
         effective_n = n_points if strategy != "pixel_proportional" else n_points * NUM_CLASSES
 
         train_ds = PointSupervisedTileDataset(

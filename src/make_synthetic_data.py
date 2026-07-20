@@ -19,28 +19,26 @@ from data_utils import CLASS_COLORS
 def make_synthetic_pair(size: int = 600, seed: int = 0):
     rng = np.random.default_rng(seed)
 
-    # Random blocky "land cover" pattern: assign a random class per coarse
-    # cell, then upsample -- crude but gives multi-class contiguous regions,
-    # which is what real land-cover masks look like.
+  
     cell = 40
     n_cells = size // cell + 1
-    class_grid = rng.integers(0, 6, size=(n_cells, n_cells))  # classes 0-5 (exclude Unknown=6 for simplicity, add patches below)
+    class_grid = rng.integers(0, 6, size=(n_cells, n_cells)) 
     class_mask = np.kron(class_grid, np.ones((cell, cell), dtype=int))[:size, :size]
 
-    # sprinkle a bit of "Unknown" (class 6) near the border to mimic real data
+    
     class_mask[:20, :] = 6
     class_mask[-20:, :] = 6
 
-    rgb_mask = CLASS_COLORS[class_mask]  # (H, W, 3)
+    rgb_mask = CLASS_COLORS[class_mask]  
 
-    # fabricate a plausible-looking RGB image: base color per class + noise
+   
     base_colors = {
-        0: (150, 150, 150),  # urban -> grayish
-        1: (200, 190, 80),   # agriculture -> tan/yellow
-        2: (170, 190, 120),  # rangeland -> olive
-        3: (40, 110, 40),    # forest -> green
-        4: (40, 80, 180),    # water -> blue
-        5: (210, 200, 180),  # barren -> beige
+        0: (150, 150, 150),  
+        1: (200, 190, 80),   
+        2: (170, 190, 120),  
+        3: (40, 110, 40),    
+        4: (40, 80, 180),   
+        5: (210, 200, 180),  
         6: (0, 0, 0),
     }
     image = np.zeros((size, size, 3), dtype=np.uint8)

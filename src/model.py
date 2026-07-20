@@ -44,9 +44,7 @@ def build_model(
             raise ValueError(f"unknown architecture {architecture!r}")
     except Exception as e:
         if encoder_weights is not None:
-            # Common in offline/sandboxed environments: pretrained-weight download
-            # fails (network restrictions). Fall back to random init so the
-            # pipeline still runs; re-run with internet access for real training.
+            
             print(f"[build_model] WARNING: failed to download '{encoder_weights}' weights "
                   f"for encoder '{encoder_name}' ({type(e).__name__}: {e}). "
                   f"Falling back to encoder_weights=None (random init).")
