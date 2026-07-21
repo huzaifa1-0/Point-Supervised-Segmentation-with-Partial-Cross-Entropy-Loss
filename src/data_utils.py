@@ -50,14 +50,15 @@ def rgb_mask_to_class_id(rgb_mask: np.ndarray) -> np.ndarray:
         f"expected (H, W, 3) RGB mask, got shape {rgb_mask.shape}"
 
     h, w, _ = rgb_mask.shape
-    class_id_mask = np.full((h, w), IGNORE_INDEX, dtype=np.int64)
+    class_id_mask = np.full((h, w), IGNORE_INDEX, dtype=np.int8)
 
-    
-    flat = rgb_mask.astype(np.int64)
-    encoded = flat[..., 0] * 256 * 256 + flat[..., 1] * 256 + flat[..., 2]
+    # Memory-efficient encoding without large intermediate arrays
+    encoded = (rgb_mask[..., 0].astype(np.int32) * 65536 + 
+               rgb_mask[..., 1].astype(np.int32) * 256 + 
+               rgb_mask[..., 2].astype(np.int32))
 
     for class_id, color in enumerate(CLASS_COLORS):
-        color_code = int(color[0]) * 256 * 256 + int(color[1]) * 256 + int(color[2])
+        color_code = int(color[0]) * 65536 + int(color[1]) * 256 + int(color[2])
         class_id_mask[encoded == color_code] = class_id
 
     return class_id_mask
@@ -128,8 +129,8 @@ def tile_image_and_mask(
                 img_tile[: y1c - y0, : x1c - x0] = image[y0:y1c, x0:x1c]
                 mask_tile[: y1c - y0, : x1c - x0] = class_id_mask[y0:y1c, x0:x1c]
             else:
-                img_tile = image[y0:y1, x0:x1]
-                mask_tile = class_id_mask[y0:y1, x0:x1]
+                img_tile = image[y0:y1, x0:x1].copy()
+                mask_tile = class_id_mask[y0:y1, x0:x1].copy()
             tiles.append((img_tile, mask_tile))
 
     return tiles
